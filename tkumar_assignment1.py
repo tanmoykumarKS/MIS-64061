@@ -43,7 +43,7 @@ x_test = vectorize_sequences(test_data)
 
 x_train[0]
 
-"""Vectorizing the data"""
+"""Vectorizing the labels"""
 
 y_train = np.asarray(train_labels).astype('float32')
 y_test = np.asarray(test_labels).astype('float32')
@@ -92,7 +92,67 @@ history = model.fit(partial_x_train,
                     batch_size=512,
                     validation_data=(x_val, y_val))
 
-"""We can see that with the increase of hidden layers from 2 to 3 let small decrease in test and validation loss but the accouracy remain almost same. """
+"""We can see that with the increase of hidden layers from 2 to 3 let small decrease in test and validation loss but the accouracy remain almost same. Having more hidden units (a higher-dimensional representation space) allows your network to learn more complex representations, but it makes the network more computationally expensive and may lead to learning unwanted patterns (patterns that will improve performance on the training data but not on the test data)."""
+
+history_dict = history.history
+history_dict.keys()
+
+
+
+import matplotlib.pyplot as plt
+
+acc = history.history['binary_accuracy']
+val_acc = history.history['val_binary_accuracy']
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+
+epochs = range(1, len(acc) + 1)
+
+# "bo" is for "blue dot"
+plt.plot(epochs, loss, 'bo', label='Training loss')
+# b is for "solid blue line"
+plt.plot(epochs, val_loss, 'b', label='Validation loss')
+plt.title('Training and validation loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+
+plt.show()
+
+plt.clf()   # clear figure
+acc = history.history['binary_accuracy']
+val_acc = history.history['val_binary_accuracy']
+
+plt.plot(epochs, acc, 'bo', label='Training acc')
+plt.plot(epochs, val_acc, 'b', label='Validation acc')
+plt.title('Training and validation accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+
+plt.show()
+
+"""From the Matplot graph we can see that training loss decreases with every epoch and the training accuracy increases with every epoch. But the validation loss and accuracy has the peak value at 3 epoch. So, we might take a call to stop after 3 epoch.
+
+Train a new Network layers with more hidden units units: 32
+"""
+
+model = models.Sequential()
+model.add(layers.Dense(32, activation='relu', input_shape=(10000,)))
+model.add(layers.Dense(1, activation='sigmoid'))
+
+model.compile(optimizer='rmsprop',
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+
+model.fit(x_train, y_train, epochs=20, batch_size=512)
+results = model.evaluate(x_test, y_test)
+
+results
+
+"""generate predictions """
+
+model.predict(x_test)
 
 history_dict = history.history
 history_dict.keys()
@@ -130,22 +190,53 @@ plt.legend()
 
 plt.show()
 
-"""Train a new Network"""
+"""Train a new Network using the mse loss function instead of binary_crossentropy and tanh activation"""
 
 model = models.Sequential()
-model.add(layers.Dense(16, activation='relu', input_shape=(10000,)))
-model.add(layers.Dense(16, activation='relu'))
+model.add(layers.Dense(16, activation='tanh', input_shape=(10000,)))
 model.add(layers.Dense(1, activation='sigmoid'))
 
 model.compile(optimizer='rmsprop',
-              loss='binary_crossentropy',
+              loss='mse',
               metrics=['accuracy'])
 
-model.fit(x_train, y_train, epochs=4, batch_size=512)
+model.fit(x_train, y_train, epochs=20, batch_size=512)
 results = model.evaluate(x_test, y_test)
 
-results
-
-"""generate predictions """
-
 model.predict(x_test)
+
+history_dict = history.history
+history_dict.keys()
+
+import matplotlib.pyplot as plt
+
+acc = history.history['binary_accuracy']
+val_acc = history.history['val_binary_accuracy']
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+
+epochs = range(1, len(acc) + 1)
+
+# "bo" is for "blue dot"
+plt.plot(epochs, loss, 'bo', label='Training loss')
+# b is for "solid blue line"
+plt.plot(epochs, val_loss, 'b', label='Validation loss')
+plt.title('Training and validation loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+
+plt.show()
+
+plt.clf()   # clear figure
+acc = history.history['binary_accuracy']
+val_acc = history.history['val_binary_accuracy']
+
+plt.plot(epochs, acc, 'bo', label='Training acc')
+plt.plot(epochs, val_acc, 'b', label='Validation acc')
+plt.title('Training and validation accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+
+plt.show()
