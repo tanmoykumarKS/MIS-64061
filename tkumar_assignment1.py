@@ -240,3 +240,35 @@ plt.ylabel('Loss')
 plt.legend()
 
 plt.show()
+
+"""Adding dropout
+Dropout is one of the most effective and most commonly used regularization techniques for neural networks. We have added 50% dropout rate for the first two layers. 
+"""
+
+dpt_model = models.Sequential()
+dpt_model.add(layers.Dense(16, activation='relu', input_shape=(10000,)))
+dpt_model.add(layers.Dropout(0.5))
+dpt_model.add(layers.Dense(16, activation='relu'))
+dpt_model.add(layers.Dropout(0.5))
+dpt_model.add(layers.Dense(1, activation='sigmoid'))
+
+dpt_model.compile(optimizer='rmsprop',
+                  loss='binary_crossentropy',
+                  metrics=['acc'])
+
+dpt_model_hist = dpt_model.fit(x_train, y_train,
+                               epochs=20,
+                               batch_size=512,
+                               validation_data=(x_test, y_test))
+
+dpt_model_val_loss = dpt_model_hist.history['val_loss']
+
+plt.plot(epochs, val_loss, 'b+', label='Original model')
+plt.plot(epochs, dpt_model_val_loss, 'bo', label='Dropout-regularized model')
+plt.xlabel('Epochs')
+plt.ylabel('Validation loss')
+plt.legend()
+
+plt.show()
+
+"""Above plot shows clear improvement over the reference network. """
